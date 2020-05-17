@@ -2,12 +2,11 @@ import boto3
 import paramiko
 import datetime
 from boto3.s3.transfer import TransferConfig
-from boto3.exceptions import S3UploadFailedError
-from paramiko import BadHostKeyException, ssh_exception
+
 
 # Fetch credentials from SSM
 print("fetching credentials from SSM!")
-ssm = boto3.client('ssm', region_name="us-east-2")
+ssm = boto3.client('ssm', region_name="Region")
 try:
     ftp_host = ssm.get_parameter(Name='ftp_host')['Parameter']['Value']
     ftp_port = ssm.get_parameter(Name='ftp_port')['Parameter']['Value']
@@ -16,7 +15,7 @@ try:
     ftp_file_path = ssm.get_parameter(Name='ftp_file_path')['Parameter']['Value']
     s3_bucket = ssm.get_parameter(Name='s3_bucket')['Parameter']['Value']
     last_etl_execution_time = ssm.get_parameter(Name='Last_ETL_Execution_Time')['Parameter']['Value']
-except ssm.exceptions as error:
+except Exception as error:
     print("Error fetching parameter from parameter store, ", error)
     exit(1)
 print("parameters fetched successfully")
@@ -33,7 +32,7 @@ except Exception as error:
     exit(1)
 print("Established connection to file server successfully")
 
-s3 = boto3.client('s3', region_name="us-east-2")
+s3 = boto3.client('s3', region_name="Region")
 MB = 1024 ** 2
 config = TransferConfig(multipart_threshold=100 * MB, multipart_chunksize=10 * MB)
 sftp = ssh_client.open_sftp()
@@ -53,7 +52,7 @@ for file in sftp.listdir(ftp_file_path):
         try:
             print("Uploading File %s" % file)
             s3.upload_fileobj(file_to_upload, s3_bucket, file, Config=config)
-        except S3UploadFailedError as e:
+        except Exception as e:
             print("Failed to upload %s to %s: %s" % (file, '/'.join([s3_bucket]), e))
 print("Uploaded files on S3 successfully")
 
