@@ -7,7 +7,3 @@ This AWS Glue Python Shell Job is used to upload intial Batch of files on AWS S3
 * Connect to SFTP file server and upload files (which are not already present on S3 and are not updated since the last time Glue job ran)
 * Automatic Handling of Failed Scenarios (Retries) and Exception Handling
 * Handles multipart upload to s3 automatically, if file size is greater than 100MB
-
-Do support me if you like my work :)
-
-[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U7U41Q7VT)
